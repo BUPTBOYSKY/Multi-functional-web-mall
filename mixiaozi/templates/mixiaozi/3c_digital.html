@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    {% load static %}
+    <meta charset="UTF-8"/>
+    <link href="{% static 'mixiaozi/css/all.css' %}" rel="stylesheet" media="all" type="text/css" />
+    <title>Mi Xiaozi Mall</title>
+  </head>
+  <body>
+    <div class="head">
+      <div class="logo"><img src="{% static 'mixiaozi/images/logo.jpg' %}" alt="Logo" /></div>
+      <div class="menu">
+        {% if user.is_authenticated %}
+      <span style="color: red;">Account Points: {{ user.userprofile.points }}</span>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <span>ID: {{ user.username }} | <a href="{% url 'logout' %}">Logout||   </a></span>
+      {% else %}
+      <span><a href="{% url 'login' %}">Login</a> | <a href="{% url 'register' %}">Register</a></span>
+      {% endif %}
+        <input type="text" id="searchBox" placeholder="search..." oninput="showSuggestions(this.value)" autocomplete="off">
+        <div id="suggestions" class="suggestions"></div>
+        <script src="{% static 'mixiaozi/js/background.js' %}"></script>
+        <button id="background-toggle">Switch background constrast</button>
+        <ul class="center">
+          <li><a href="{% url 'home' %}">Home</a></li>
+          <li><a href="{% url '3c_digital' %}">3c_digital</a></li>
+          <li><a href="{% url 'clothing' %}">Clothing</a></li>
+          <li><a href="{% url 'supermarket' %}">Supermarket</a></li>
+          <li><a href="{% url 'cart' %}">Cart</a></li>
+          <li><a href="{% url 'messages' %}">Messages</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="banner2"><img src="{% static 'mixiaozi/images/a1.jpg' %}" width="100%" alt="广告图" /> </div>
+
+    <div class="content">
+      <div class="hei"></div>
+      <div class="bar">
+        <h2>3c_digital</h2>
+      </div>
+      <div class="cc">
+        <ul>
+          {% for product in products %}
+              <li>
+                  <a href="{% url 'product_detail' product.id %}">
+                      {% if product.image %}
+                          <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                      {% else %}
+                          <img src="{% static 'mixiaozi/images/default.jpg' %}" alt="默认图片">
+                      {% endif %}
+                      <p>{{ product.name }}</p>
+                      <h2>￥{{ product.price }}</h2>
+                  </a>
+              </li>
+          {% endfor %}
+      </ul>
+      </div>
+      <div class="clear"></div>
+    </div>
+    <div class="end">
+      <p>Mi Xiaozi Mall</p>
+    </div>
+  </body>
+</html>

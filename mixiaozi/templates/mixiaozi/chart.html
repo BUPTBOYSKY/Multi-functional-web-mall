@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    {% load static %}
+    <meta charset="UTF-8"/>
+    <link href="{% static 'mixiaozi/css/all.css' %}" rel="stylesheet" media="all" type="text/css" />
+    <title>Mi Xiaozi Mall</title>
+</head>
+<body>
+  <div class="head">
+    <div class="logo"><img src="{% static 'mixiaozi/images/logo.jpg' %}" alt="Logo" /></div>
+    <div class="menu">
+      {% if user.is_authenticated %}
+      <span style="color: red;">Account Points: {{ user.userprofile.points }}</span>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <span>ID: {{ user.username }} | <a href="{% url 'logout' %}">Logout||   </a></span>
+      {% else %}
+      <span><a href="{% url 'login' %}">Login</a> | <a href="{% url 'register' %}">Register</a></span>
+      {% endif %}
+        <input type="text" id="searchBox" placeholder="search..." oninput="showSuggestions(this.value)" autocomplete="off">
+        <div id="suggestions" class="suggestions"></div>
+        <script src="{% static 'mixiaozi/js/background.js' %}"></script>
+        <button id="background-toggle">Switch background contrast</button>
+        <ul class="center">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url '3c_digital' %}">3c_digital</a></li>
+            <li><a href="{% url 'clothing' %}">Clothing</a></li>
+            <li><a href="{% url 'supermarket' %}">Supermarket</a></li>
+            <li><a href="{% url 'cart' %}">Cart</a></li>
+            <li><a href="{% url 'messages' %}">Messages</a></li>
+        </ul>
+    </div>
+  </div>
+  
+  <div class="center">
+    <div class="bar">
+      <h2>Cart</h2>
+    </div>
+    <br><br>
+    
+    <div id="page">
+      {% if cart_items %}
+      <!-- 显示购物车商品 -->
+      <form method="post" class="cart-form" id="cartForm">
+        {% csrf_token %}
+        <div id="listdiv">
+          <table cellpadding="0" cellspacing="0" id="gwcTable" width="100%">
+            <tr>
+              <td width="109"><input type="checkbox" id="checkAll" /> check all</td>
+              <td width="120">Goods</td>
+              <td width="241">unit-price</td>
+              <td width="273">quantity</td>
+              <td width="132">subtotal</td>
+              <td width="111">operation</td>
+            </tr>
+            {% for item in cart_items %}
+            <tr data-item-id="{{ item.id }}">
+              <td><input type="checkbox" class="checkCss"/></td>
+              <td>
+                  <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                  <p>{{ item.product.name }}</p>
+              </td>
+              <td>{{ item.product.price }}</td>
+              <td class="count">
+                  <input class="reduceCss" data-item-id="{{ item.id }}" value="-" type="button"/>
+                  <input type="text" class="inputCountCss" data-item-id="{{ item.id }}" value="{{ item.quantity }}" size="8" readonly/>
+                  <input class="addCss" data-item-id="{{ item.id }}" value="+" type="button"/>
+              </td>
+              <td class="total-price" data-item-id="{{ item.id }}">{{ item.product.price|floatformat:2 }}</td>
+              <td><a href="#" class="deleteItem" data-item-id="{{ item.id }}">Delete</a></td>
+          </tr>
+            {% endfor %}
+          </table>
+        </div>
+      </form>
+      <div id="jiesuan">
+        {% if user.is_authenticated %}
+        <div class="t jisuanbtn">
+          <input type="submit" name="btnOrder" id="btnOrder" value="Purchase"/>
+        </div>
+        {% endif %}
+        <div class="t TotalMoney">Total:￥<span id="priceTotal">{{ total_price|floatformat:2 }}</span></div>
+        <div class="t">Selected products <span id="countTotal">{{ cart_items|length }}</span> piece</div>
+      </div>
+      {% else %}
+      <div style="text-align: center; color: red; font-weight: bold;">
+        <!-- 未登录或购物车为空时显示 -->
+        <p>Your cart is empty.</p>
+        {% if not user.is_authenticated %}
+        <p>
+            Please 
+            <a href="{% url 'login' %}?next={{ request.path }}" style="color: red; text-decoration: none;" 
+               onmouseover="this.style.color='blue'" 
+               onmouseout="this.style.color='red'">
+                click here
+            </a> 
+            to log in to view your cart items.
+        </p>
+        {% endif %}
+    </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <script src="{% static 'mixiaozi/js/gouwu.js' %}"></script>
+
+  <script>
+   // 捕捉购买按钮点击事件
+  document.getElementById('btnOrder').addEventListener('click', function(event) {
+      // 跳转到ok.html
+      window.location.href = "{% url 'ok' %}";
+  });
+  </script>
+</body>
+</html>

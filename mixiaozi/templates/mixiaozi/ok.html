@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    {% load static %}
+    <meta charset="UTF-8"/>
+    <link href="{% static 'mixiaozi/css/all.css' %}" rel="stylesheet" media="all" type="text/css" />
+    <title>Mi Xiaozi Mall - Payment Successful</title>
+</head>
+<body>
+    <div class="head">
+        <div class="logo">
+            <img src="{% static 'mixiaozi/images/logo.jpg' %}" alt="Mi Xiaozi Mall Logo" />
+        </div>
+        <div class="menu">
+            {% if user.is_authenticated %}
+      <span style="color: red;">Account Points: {{ user.userprofile.points }}</span>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <span>ID: {{ user.username }} | <a href="{% url 'logout' %}">Logout||   </a></span>
+      {% else %}
+      <span><a href="{% url 'login' %}">Login</a> | <a href="{% url 'register' %}">Register</a></span>
+      {% endif %}
+            <input type="text" id="searchBox" placeholder="search..." oninput="showSuggestions(this.value)" autocomplete="off">
+            <div id="suggestions" class="suggestions"></div>
+            <button id="background-toggle">Switch background contrast</button>
+            <ul class="center">
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="{% url '3c_digital' %}">3c_digital</a></li>
+                <li><a href="{% url 'clothing' %}">Clothing</a></li>
+                <li><a href="{% url 'supermarket' %}">Supermarket</a></li>
+                <li><a href="{% url 'cart' %}">Cart</a></li>
+                <li><a href="{% url 'messages' %}">Messages/Setting</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="clear"></div>
+    
+    <div class="content center">
+        <div class="hei40"></div>
+        <div class="sss" style="clear:both">
+            <h2 style="color:#bb6a34">Payment successful</h2>
+            <p>Congratulations, you have successfully made the payment. You can take a look at other products.<br />
+               Click here <a href="{% url 'home' %}" class="bck" style="color: #bb6a34; font-weight: bold; font-size: 18px;">Back home</a>
+
+            <br /><br />
+            <img src="{% static 'mixiaozi/images/tu.jpg' %}" width="200" alt="Payment successful image" />
+            <p>&nbsp;</p>
+        </div>
+    </div>
+    
+    <div class="clear"></div>
+    
+    <div class="end">
+        <p>Mi Xiaozi Mall</p>
+    </div>
+</body>
+</html>

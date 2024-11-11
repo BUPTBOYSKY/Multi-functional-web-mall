@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    {% load static %}
+    <meta charset="UTF-8"/>
+    <link href="{% static 'mixiaozi/css/all.css' %}" rel="stylesheet" media="all" type="text/css" />
+    <title>Mi Xiaozi Mall</title>
+</head>
+<body>
+    <div class="head">
+        <div class="logo"><img src="{% static 'mixiaozi/images/logo.jpg' %}" alt="Logo" /></div>
+        <div class="menu">
+            {% if user.is_authenticated %}
+      <span style="color: red;">Account Points: {{ user.userprofile.points }}</span>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <span>ID: {{ user.username }} | <a href="{% url 'logout' %}">Logout||   </a></span>
+      {% else %}
+      <span><a href="{% url 'login' %}">Login</a> | <a href="{% url 'register' %}">Register</a></span>
+      {% endif %}
+            <input type="text" id="searchBox" placeholder="search..." oninput="showSuggestions(this.value)" autocomplete="off">
+            <div id="suggestions" class="suggestions"></div>
+            <script src="{% static 'mixiaozi/js/background.js' %}"></script>
+            <button id="background-toggle">Switch background constrast</button>
+            <ul class="center">
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="{% url '3c_digital' %}">3c_digital</a></li>
+                <li><a href="{% url 'clothing' %}">Clothing</a></li>
+                <li><a href="{% url 'supermarket' %}">Supermarket</a></li>
+                <li><a href="{% url 'cart' %}">Cart</a></li>
+                <li><a href="{% url 'messages' %}">Messages</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div class="center">
+        <div class="content" style="max-width:700px; margin:40px auto">
+            <div class="pad font" style="font-size:14px; line-height:32px">
+                <img src="{% static 'mixiaozi/images/lx.jpg' %}" alt="图片">
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="comment-box">
+            <div class="header">Setting</div>
+            <button id="background-picture">Add background image</button>
+            <button id="clear-background">Delate background image</button>
+            <div class="font-size-control">
+                <label for="font-size-slider">font size:</label>
+                <input type="range" id="font-size-slider" min="14" max="30" value="14">
+                <button id="increase-font">Increase font size</button>
+            </div>
+            <button class="close">Messasge without interruption</button>
+
+            <div class="comment-form">
+                <div class="header">Message</div>
+                <div>
+                    <input type="text" id="name" placeholder="Please select the recipient you want to send to">
+                </div>
+                <div>
+                    <textarea name="" id="comment" cols="30" rows="3" placeholder="Please enter"></textarea>
+                </div>
+                <button id="btn-post">Send</button>
+            </div>
+
+            <div>
+                <h4 class="header">My message</h4>
+                <div id="comments"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let comments = [
+            {
+                name: "Mi Xiaozi Mall",
+                comment: "The store you are following has new products launched, don't miss out on limited time discounts!",
+                time: "Tue Jun 25 2024",
+            },
+            {
+                name: "Mi Xiaozi Mall, I love Xiaomi",
+                comment: "Dear customer, your order has been completed. If you have any questions, please feel free to contact customer service for assistance. Your positive feedback is the driving force behind our progress, and you can also receive various coupons with multi word and attached pictures!",
+                time: "Tue Jun 25 2024",
+            },
+        ];
+
+        let commentsBox = document.querySelector('#comments');
+        let nameInput = document.querySelector('#name');
+        let commentInput = document.querySelector('#comment');
+        let btnSubmit = document.querySelector('#btn-post');
+        let btnClose = document.querySelector('.close');
+
+        let isClosed = false;
+
+        btnClose.onclick = function () {
+            if (isClosed) {
+                btnClose.innerHTML = '消息免打扰';
+            } else {
+                btnClose.innerHTML = '取消免打扰';
+            }
+
+            nameInput.disabled = !nameInput.disabled;
+            commentInput.disabled = !commentInput.disabled;
+            btnSubmit.disabled = !btnSubmit.disabled;
+            isClosed = !isClosed;
+        }
+
+        renderComments();
+
+        btnSubmit.onclick = function () {
+            let nameStr = nameInput.value.replace(/<(\/?\w+)>/g, "&lt;$1&gt;");
+            let commentStr = commentInput.value.replace(/<(\/?\w+)>/g, "&lt;$1&gt;");
+            comments.unshift({
+                name: nameStr,
+                comment: commentStr,
+                time: new Date(),
+            });
+            renderComments();
+        }
+
+        function renderComments() {
+            commentsBox.innerHTML = '';
+            comments.forEach((item) => {
+                commentsBox.insertAdjacentHTML('beforeend',
+                    `
+                    <hr />
+                    <h4>
+                      <span>${item.name}</span>
+                      <span class="date">${item.time}</span>
+                    </h4>
+                    <p>${item.comment}</p>
+                    `
+                );
+            });
+        }
+    </script>
+    <script src="{% static 'mixiaozi/js/background.js' %}"></script>
+    <div class="end">
+        <p>Mi Xiaozi Mall</p>
+    </div>
+</body>
+</html>

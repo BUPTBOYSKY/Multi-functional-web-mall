@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    {% load static %}
+    <meta charset="UTF-8"/>
+    <link href="{% static 'mixiaozi/css/all.css' %}" rel="stylesheet" media="all" type="text/css" />
+    {% if product_detail and product_detail.title %}
+        <title>{{ product_detail.title }}</title>
+    {% else %}
+        <title>{{ product.name }}</title>
+    {% endif %}
+    {% csrf_token %}
+</head>
+<body>
+    <div class="head">
+        <div class="logo"><img src="{% static 'mixiaozi/images/logo.jpg' %}" alt="Logo" /></div>
+        <div class="menu">
+            <span><a href="{% url 'login' %}">login</a> | <a href="{% url 'register' %}">register</a></span>
+            <input type="text" id="searchBox" placeholder="search..." oninput="showSuggestions(this.value)" autocomplete="off">
+            <div id="suggestions" class="suggestions"></div>
+            <script src="{% static 'mixiaozi/js/background.js' %}"></script>
+            <button id="background-toggle">Switch background contrast</button>
+            <ul class="center">
+                <li><a href="{% url 'home' %}">home</a></li>
+                <li><a href="{% url '3c_digital' %}">3c_digital</a></li>
+                <li><a href="{% url 'clothing' %}">clothing</a></li>
+                <li><a href="{% url 'supermarket' %}">supermarket</a></li>
+                <li><a href="{% url 'cart' %}">cart</a></li>
+                <li><a href="{% url 'messages' %}">messages</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="banner2" style="text-align: center;">
+        {% if product_detail and product_detail.banner_image %}
+            <img src="{{ product_detail.banner_image.url }}" style="max-width: 100%;  display: inline-block;" alt="Banner" />
+        {% elif product.image %}
+            <img src="{{ product.image.url }}" style="max-width: 100%;  display: inline-block;" alt="Banner" />
+        {% else %}
+            <img src="{% static 'mixiaozi/images/default.jpg' %}" style="max-width: 100%; display: inline-block;" alt="Banner" />
+        {% endif %}
+    </div>
+    
+    <div class="content">
+        <!-- 商品详情部分 -->
+        <div class="product-detail-wrapper" style="text-align: center; max-width: 800px; margin: 0 auto;">
+            {% if product_detail and product_detail.title %}
+                <h1>{{ product_detail.title }}</h1>
+            {% else %}
+                <h1>{{ product.name }}</h1>
+            {% endif %}
+
+            <p>商品价格：<font size="+2" color="#FF3333">
+                {% if product_detail and product_detail.price_text %}
+                    {{ product_detail.price_text }}
+                {% else %}
+                    {{ product.price }}
+                {% endif %}
+            </font></p>
+            <a href="#" id="addToCartButton" class="more" style="margin-top: 20px;">加入购物车</a>
+        </div>
+
+        <!-- 商品描述图片 -->
+        <div class="bar">
+            <h2>商品详情</h2>
+        </div>
+        <p align="center">
+            {% if product_detail and product_detail.description_image %}
+            <img src="{{ product_detail.description_image.url }}" style="width: 120%; max-width: 800px; height: auto; display: inline-block;" alt="商品详情"/>
+            {% elif product.image %}
+                <img src="{{ product.image.url }}" style="width: 120%; max-width: 800px; height: auto; display: inline-block;" alt="商品详情"/>
+            {% else %}
+                <img src="{% static 'mixiaozi/images/default.jpg' %}" style="width: 120%; max-width: 800px; height: auto; display: inline-block;" alt="商品详情"/>
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- 页脚 -->
+    <div class="end">
+        <p>Mi Xiaozi Mall</p>
+    </div>
+
+    <!-- JavaScript 部分 -->
+    <script>
+        function getCSRFToken() {
+            const csrfTokenElement = document.querySelector('[name=csrfmiddlewaretoken]');
+            return csrfTokenElement ? csrfTokenElement.value : '';
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const addToCartButton = document.getElementById('addToCartButton');
+            if (addToCartButton) {
+                addToCartButton.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    const productId = {{ product.id }};
+                    const addToCartUrl = "{% url 'add_to_cart' %}";
+
+                    fetch(addToCartUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCSRFToken()
+                        },
+                        body: JSON.stringify({ 'product_id': productId })
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.href = "{% url 'cart' %}";
+                        } else {
+                            return response.json().then(data => {
+                                alert(data.error || "添加到购物车失败，请重试。");
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert("添加到购物车失败，请检查网络连接并重试。");
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

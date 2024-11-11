@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    {% load static %}
+    <meta charset="UTF-8"/>
+    <link href="{% static 'mixiaozi/css/all.css' %}" rel="stylesheet" media="all" type="text/css" />
+    <title>Mi Xiaozi Mall</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+<body>
+  <div class="head">
+    <div class="logo"><img src="{% static 'mixiaozi/images/logo.jpg' %}" alt="Logo" /></div>
+    <div class="menu">
+      {% if user.is_authenticated %}
+      <span style="color: red;">Account Points: {{ user.userprofile.points }}</span>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <span>ID: {{ user.username }} | <a href="{% url 'logout' %}">Logout||   </a></span>
+      {% else %}
+      <span><a href="{% url 'login' %}">Login</a> | <a href="{% url 'register' %}">Register</a></span>
+      {% endif %}
+      <input type="text" id="searchBox" placeholder="search..." oninput="showSuggestions(this.value)" autocomplete="off">
+      <div id="suggestions" class="suggestions"></div>
+      <script src="{% static 'mixiaozi/js/background.js' %}"></script>
+      <button id="background-toggle">Switch background contrast</button>
+      <ul class="center">
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li><a href="{% url '3c_digital' %}">3c_digital</a></li>
+        <li><a href="{% url 'clothing' %}">Clothing</a></li>
+        <li><a href="{% url 'supermarket' %}">Supermarket</a></li>
+        <li><a href="{% url 'cart' %}">Cart</a></li>
+        <li><a href="{% url 'messages' %}">Messages</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="banner2"><img src="{% static 'mixiaozi/images/h.jpg' %}" width="100%" alt="Banner" /> </div>
+
+  <div class="bar" style="padding-top:20px">
+    <h2>Account Login</h2>
+  </div>
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    <div class="pad">
+      <form id="loginForm" method="POST" action="{% url 'login' %}">
+        {% csrf_token %}
+        <ul class="feedback">
+          <li style="display: flex; justify-content: center; align-items: center;">
+            <label for="username" style="min-width: 100px; text-align: right; padding-right: 10px;">account</label>
+            <input type="text" name="username" id="username" placeholder="Please enter your account" required style="flex-grow: 1; max-width: 300px;">
+          </li>
+          <div class="hei10"></div>
+          <li style="display: flex; justify-content: center; align-items: center;">
+            <label for="password" style="min-width: 100px; text-align: right; padding-right: 10px;">password</label>
+            <input type="password" name="password" id="password" placeholder="Please enter your password" required style="flex-grow: 1; max-width: 300px;">
+          </li>
+          <div class="hei10"></div>
+          <button type="submit" style="width: 300px; height: 40px; background-color: #93c6d9; color: white; border: none; border-radius: 5px; font-size: 16px; text-align: center; display: flex; justify-content: center; align-items: center;">Login</button>
+
+          <br><br>
+          <p align="center">no account? <a href="{% url 'register' %}" style="color:#FF6600">register here</a></p>
+
+          <div align="center" style="margin-top: 20px;">  <!-- 添加 margin 来增加间距 -->
+              <p>Already have an account but no face image?</p>
+              <p><a href="{% url 'face_re_register' %}" style="color:#FF6600;">Re-register your face here</a></p> <!-- 分成两行 -->
+          </div>
+
+        </ul>
+      </form>
+    </div>
+    
+
+
+  <div class="bar" style="padding-top:3px">
+    <h2>face login</h2>
+  </div>
+  <div class="pad">
+    <form action="{% url 'facelogin' %}">
+      <ul class="feedback">
+        <div class="hei10"></div>
+        <button type="submit"style="width: 300px; height: 40px; background-color: #93c6d9; color: white; border: none; border-radius: 5px; font-size: 16px; text-align: center; display: flex; justify-content: center; align-items: center;">Face login</button>
+        <br><br>
+      </ul>
+    </form>
+  </div>
+
+  <div class="end">
+    <p>Mi Xiaozi Mall</p>
+  </div>
+
+</body>
+</html>

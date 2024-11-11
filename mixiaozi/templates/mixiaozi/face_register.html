@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Capture Registration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        #videoContainer {
+            margin: 20px auto;
+            max-width: 800px;
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        video {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+        }
+
+        canvas {
+            display: none;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .message {
+            margin-top: 20px;
+            font-size: 16px;
+            color: red;
+        }
+
+        .loading {
+            margin-top: 20px;
+            font-size: 16px;
+            color: blue;
+        }
+
+        .input-group {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: inline-block;
+            min-width: 150px;
+            text-align: left;
+        }
+
+        .input-group input {
+            padding: 8px;
+            width: 300px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<div id="videoContainer">
+    <h2>Face Registration</h2>
+    <video id="video" autoplay></video>
+    <canvas id="canvas" width="640" height="480"></canvas>
+
+    <div class="input-group">
+        <label for="username">Account:</label>
+        <input type="text" id="username" name="username" placeholder="Please enter your account" required>
+    </div>
+    <div class="input-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" placeholder="Please enter your password" required>
+    </div>
+    <div class="input-group">
+        <label for="confirmPassword">Confirm Password:</label>
+        <input type="password" id="confirmPassword" name="confirm_password" placeholder="Please confirm your password" required>
+    </div>
+
+    <form id="uploadImageForm" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="imageData" id="imageData">
+        <button type="button" id="captureButton">Capture and Register</button>
+        <input type="file" id="fileInput" accept="image/*">
+        <button type="button" id="uploadFileButton">Upload from File</button>
+    </form>
+
+    <div id="message" class="message"></div>
+    <div id="loading" class="loading" style="display: none;">Processing, please wait...</div>
+</div>
+
+<script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const captureButton = document.getElementById('captureButton');
+    const uploadFileButton = document.getElementById('uploadFileButton');
+    const imageDataInput = document.getElementById('imageData');
+    const messageDiv = document.getElementById('message');
+    const loadingDiv = document.getElementById('loading');
+    const fileInput = document.getElementById('fileInput');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+
+    // Get video stream from camera
+    async function getVideoStream() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+        } catch (error) {
+            console.error('Error accessing the camera:', error);
+            messageDiv.textContent = 'Unable to access the camera, please check your permission settings.';
+        }
+    }
+
+    // Capture image from video
+    function captureImage() {
+        const username = usernameInput.value;
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+
+        if (password !== confirmPassword) {
+            messageDiv.textContent = 'Passwords do not match.';
+            return;
+        }
+
+        const context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const imageData = canvas.toDataURL('image/jpeg');
+        imageDataInput.value = imageData;
+
+        submitImageData(username, password);
+    }
+
+    // Handle file upload from user's device
+    function handleFileUpload() {
+        const file = fileInput.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imageData = e.target.result;
+                imageDataInput.value = imageData; // Base64-encoded image data
+                submitImageData(usernameInput.value, passwordInput.value);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            messageDiv.textContent = 'Please select a file first.';
+        }
+    }
+
+    // Submit image data via AJAX
+    function submitImageData(username, password) {
+        // Show loading animation
+        loadingDiv.style.display = 'block';
+        messageDiv.textContent = '';
+
+        const formData = new FormData();
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+        formData.append('imageData', imageDataInput.value);
+        formData.append('username', username);
+        formData.append('password', password);
+
+        fetch("{% url 'save_face_registration' %}", {
+            method: 'POST',
+            body: formData,
+            mode: 'same-origin'
+        })
+        .then(response => response.json())
+        .then(data => {
+            loadingDiv.style.display = 'none';
+            if (data.success) {
+                messageDiv.style.color = 'green';
+                messageDiv.textContent = 'Face registration successful! Redirecting to login page...';
+                // Redirect after successful registration
+                setTimeout(() => {
+                    window.location.href = "{% url 'login' %}";
+                }, 1500);
+            } else {
+                messageDiv.style.color = 'red';
+                messageDiv.textContent = data.message;
+            }
+        })
+        .catch(error => {
+            loadingDiv.style.display = 'none';
+            console.error('Error:', error);
+            messageDiv.style.color = 'red';
+            messageDiv.textContent = 'Unable to connect to the server, please try again.';
+        });
+    }
+
+    captureButton.addEventListener('click', captureImage);
+    uploadFileButton.addEventListener('click', handleFileUpload);
+    window.addEventListener('load', getVideoStream);
+</script>
+</body>
+</html>

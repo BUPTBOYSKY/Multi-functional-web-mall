@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    {% load static %}
+    <meta charset="UTF-8"/>
+    <link href="{% static 'mixiaozi/css/all.css' %}" rel="stylesheet" media="all" type="text/css" />
+    <title>Mi Xiaozi Mall</title>
+</head>
+<body>
+    <div class="head">
+        <div class="logo"><img src="{% static 'mixiaozi/images/logo.jpg' %}" alt="Mi Xiaozi MallLogo" /></div>
+        <div class="menu">
+            {% if user.is_authenticated %}
+      <span style="color: red;">Account Points: {{ user.userprofile.points }}</span>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <span>ID: {{ user.username }} | <a href="{% url 'logout' %}">Logout||   </a></span>
+      {% else %}
+      <span><a href="{% url 'login' %}">Login</a> | <a href="{% url 'register' %}">Register</a></span>
+      {% endif %}
+            <input type="text" id="searchBox" placeholder="search..." oninput="showSuggestions(this.value)" autocomplete="off">
+            <div id="suggestions" class="suggestions"></div>
+            <button id="background-toggle">Switch background constrast</button>
+            <ul class="center">
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="{% url '3c_digital' %}">3c_digital</a></li>
+                <li><a href="{% url 'clothing' %}">Clothing</a></li>
+                <li><a href="{% url 'supermarket' %}">Supermarket</a></li>
+                <li><a href="{% url 'cart' %}">Cart</a></li>
+                <li><a href="{% url 'messages' %}">Messages/Setting</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="banner">
+        <div class="banner" id="banner">
+            <ul id="b_pic">
+                <li style="display: block;"><img src="{% static 'mixiaozi/images/banner.jpg' %}" alt="广告图1"></li>
+                <li><img src="{% static 'mixiaozi/images/banner2.jpg' %}" alt="广告图2"></li>
+                <li><img src="{% static 'mixiaozi/images/banner3.jpg' %}" alt="广告图3"></li>
+            </ul>
+            <ul id="b_an">
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>
+        </div>
+    </div>
+    <div class="content">
+        <div class="scrollleft">
+            <ul class="row">
+                <a href="{% url '3c_digital' %}">
+                    <li> <img src="{% static 'mixiaozi/images/1.jpg' %}" alt="3c_digital"/>
+                        <h2 style="background:#492edc">3c_digital</h2>
+                    </li>
+                </a>
+                <a href="{% url 'clothing' %}">
+                    <li> <img src="{% static 'mixiaozi/images/2.jpg' %}" alt="clothing"/>
+                        <h2 style="background:#dc2e7f">clothing</h2>
+                    </li>
+                </a>
+                <a href="{% url 'supermarket' %}">
+                    <li> <img src="{% static 'mixiaozi/images/3.png' %}" alt="supermarket"/>
+                        <h2 style="background:#CC9966">supermarket</h2>
+                    </li>
+                </a>
+                <a href="{% url 'member' %}">
+                    <li> <img src="{% static 'mixiaozi/images/4.jpg' %}" alt="会员"/>
+                        <h2 style="background:#99CCFF">member</h2>
+                    </li>
+                </a>
+            </ul>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div class="end">
+        <p>Mi Xiaozi Mall</p>
+    </div>
+    <script src="{% static 'mixiaozi/js/lunbo.js' %}" type="text/javascript"></script>
+    <script src="{% static 'mixiaozi/js/background.js' %}"></script>
+    <script src="{% static 'mixiaozi/js/search.js' %}"></script>
+</body>
+</html>

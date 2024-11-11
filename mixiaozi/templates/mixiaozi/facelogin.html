@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Capture Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        #videoContainer {
+            margin: 20px auto;
+            max-width: 800px;
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        video {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+        }
+
+        canvas {
+            display: none;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .message {
+            margin-top: 20px;
+            font-size: 16px;
+            color: red;
+        }
+
+        .loading {
+            margin-top: 20px;
+            font-size: 16px;
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+<div id="videoContainer">
+    <video id="video" autoplay></video>
+    <canvas id="canvas" width="640" height="480"></canvas>
+    <form id="uploadImageForm" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="imageData" id="imageData">
+        <button type="button" id="captureButton">Capture and Login</button>
+    </form>
+    <div id="message" class="message"></div>
+    <div id="loading" class="loading" style="display: none;">Processing, please wait...</div>
+</div>
+
+<script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const captureButton = document.getElementById('captureButton');
+    const imageDataInput = document.getElementById('imageData');
+    const messageDiv = document.getElementById('message');
+    const loadingDiv = document.getElementById('loading');
+
+    async function getVideoStream() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+        } catch (error) {
+            console.error('Error accessing the camera:', error);
+            messageDiv.textContent = '无法访问摄像头，请检查您的权限设置。';
+        }
+    }
+
+    function captureImage() {
+        const context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const imageData = canvas.toDataURL('image/jpeg');
+        imageDataInput.value = imageData;
+
+        // 显示加载动画
+        loadingDiv.style.display = 'block';
+        messageDiv.textContent = '';
+
+        // Submit the form via AJAX
+        const formData = new FormData();
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+        formData.append('imageData', imageData);
+
+        fetch("{% url 'save_image_to_db' %}", {
+            method: 'POST',
+            body: formData,
+            mode: 'same-origin'
+        })
+        .then(response => response.json())
+        .then(data => {
+            loadingDiv.style.display = 'none';
+            if (data.success) {
+                messageDiv.style.color = 'green';
+                messageDiv.textContent = `欢迎，${data.user_id}！人脸识别成功。`;
+                setTimeout(() => {
+                    window.location.href = "{% url 'home' %}";
+                }, 1500);
+            } else {
+                messageDiv.style.color = 'red';
+                messageDiv.textContent = data.message;
+            }
+        })
+        .catch(error => {
+            loadingDiv.style.display = 'none';
+            console.error('Error:', error);
+            messageDiv.style.color = 'red';
+            messageDiv.textContent = '无法连接到服务器，请重试。';
+        });
+    }
+
+    captureButton.addEventListener('click', captureImage);
+    window.addEventListener('load', getVideoStream);
+</script>
+</body>
+</html>
