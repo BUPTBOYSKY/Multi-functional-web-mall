@@ -56,11 +56,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "myproject.wsgi.application"
 
-# 阿里云OSS凭据
-OSS_ACCESS_KEY_ID = config('OSS_ACCESS_KEY_ID', default='LTAI5tQxfBKy6Xk1f8ox94V6')
-OSS_ACCESS_KEY_SECRET = config('OSS_ACCESS_KEY_SECRET', default='WyVxJOcUa9VEhIOVSGnMahIWlqnqNq')
-OSS_ENDPOINT = 'https://oss-cn-beijing.aliyuncs.com'
-OSS_BUCKET_NAME = 'ist-mini-semester-july'
 
 # Database
 DATABASES = {
