@@ -1,60 +1,35 @@
-# SMS Spam Detection with BERT and BiLSTM
+# Multi-functional-web-mall
 
-This repository contains the code for SMS spam detection using a combination of BERT (Bidirectional Encoder Representations from Transformers) and BiLSTM (Bidirectional Long Short-Term Memory) models. The model is trained and evaluated on the SMS Spam Collection Dataset.
+In order to show the personal information and and product, we design a web mall, the  website can be concluded to three part: Front end website, Backend database and the connection between them.
 
 ## Overview
 
-SMS spam detection is an important task in the field of natural language processing and information security. This project aims to effectively detect spam messages using a combination of pre-trained BERT model and BiLSTM network. The BERT model is fine-tuned on the SMS dataset to capture semantic and contextual information, while the BiLSTM network is used to model the sequential dependencies in the text.
+1. In the front website, we use html, css and javascrip to design a user friendly website, which can display personalized information. 
+2. And for the Data Management & connection, Under the Django structure, we can use Django admin to manage front-end web pages, and with the help of URL configuration, the website can synchronize updates.Therefore, when I change the items stored in the cloud database, the webpage will also change accordingly.
+2. And in the backend, we use Django's ORM for database design and operations, the back-end structure show here. More over, we use SQLite to simplify the development and testing process. The below picture shows our cloud database.
 
 ## Requirements
 
-+ Python 3.6+
-+ PyTorch 1.8+
-+ Transformers 4.5+
-+ scikit-learn 0.24+
-+ pandas 1.2+
-
-## Dataset
-
-The SMS Spam Collection Dataset is used for training and evaluation. The dataset contains a total of 5,574 SMS messages, out of which 747 (13.4%) are spam messages and 4,827 (86.6%) are legitimate messages (ham). The dataset is preprocessed and split into train and test sets using a stratified random sampling approach.
-
-The dataset is located in the `data` directory and is loaded using the `SMSDataset` class defined in `data.py`.
-
-## Model Architecture
-
-![avag](./imgs/1.png)
-
-The model architecture consists of two main components:
-
-1. **BERT**: A pre-trained BERT model is used to extract contextual embeddings from the input text. The 'bert-base-uncased' model is used and fine-tuned during training.
-2. **BiLSTM**: A bidirectional LSTM network is used to capture the sequential dependencies in the text. The hidden states from both directions are concatenated and passed through a fully connected layer for classification.
-
-The model architecture is implemented in the `BertBiLSTMClassifier` class defined in `model.py`.
++ Python 3.0+
++ Html5
++ JavaScript
++ Django 5.0+
 
 ## Usage
 
-To train and evaluate the model, run the following command:
-
+Download all file, and then open Integrated Terminal，load it into the folder of 'Multi functional web all main' that you downloaded, and then enter the command:
 ```bash
-python main.py
+python manage.py makemigrations
+python manage.py migrate
+python manage.py runserver
 ```
-
-The script will load the dataset, initialize the model, and start the training process. After each epoch, the model will be evaluated on the test set, and the loss and F1-score will be printed.
-
-## Results
-
-The model achieves the following results on the test set:
-
-| Model    | Accuracy (%) | Precision (%) | Recall (%) | F1-score (%) |
-| :------- | :----------- | :------------ | :--------- | :----------- |
-| NB       | 98.1+-0.2    | 97.3+-0.5     | 91.5+-1.2  | 94.3+-0.7    |
-| SVM      | 98.5+-0.1    | 98.1+-0.3     | 92.7+-0.9  | 95.3+-0.5    |
-| LR       | 98.6+-0.1    | 98.2+-0.2     | 93.1+-0.7  | 95.6+-0.4    |
-| CNN      | 98.8+-0.1    | 98.5+-0.2     | 93.9+-0.6  | 96.1+-0.3    |
-| BiLSTM   | 99.0+-0.1    | 98.7+-0.2     | 94.5+-0.5  | 96.6+-0.3    |
-| BERT     | 99.2+-0.1    | 99.0+-0.1     | 95.2+-0.4  | 97.1+-0.2    |
-| Proposed | 99.4+-0.1    | 99.2+-0.1     | 96.1+-0.3  | 97.6+-0.2    |
+After running the server, you can open the webpage with a browser http://127.0.0.1:8000/mixiaozi/ To view the website, or use http://127.0.0.1:8000/admin/ To manage the database.
+The account that sign in the admin: 
+```bash
+Username: testuser
+Password: 123456
+```
 
 ## Conclusion
 
-In conclusion, our work highlights the potential of leveraging pre-trained language models and deep learning techniques for SMS spam detection and provides a strong baseline for future research in this area.
+The Mi Xiaozi Mall project is a user-friendly e-commerce platform built with Django, featuring categories like electronics, clothing, and supermarket items. It offers secure cart management, real-time updates, face recognition login, and a responsive design. Key features include dynamic navigation, a background toggle, and AJAX for seamless user interactions, creating an efficient and engaging online shopping experience.
